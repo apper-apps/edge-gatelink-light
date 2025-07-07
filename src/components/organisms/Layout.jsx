@@ -14,8 +14,8 @@ const Layout = () => {
     setSidebarOpen(false)
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
+return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
       
       <div className="lg:pl-64">

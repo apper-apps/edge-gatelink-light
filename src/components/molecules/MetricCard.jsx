@@ -32,11 +32,11 @@ const MetricCard = ({
     neutral: 'Minus'
   }
 
-  return (
-    <Card className={cn('p-6', className)}>
+return (
+    <Card variant="gradient" className={cn('p-6 relative overflow-hidden', className)}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+          <p className="text-sm font-semibold text-gray-700 mb-2">{title}</p>
           <p className="text-3xl font-bold text-gray-900 mb-2">{value}</p>
           {trend && (
             <div className="flex items-center gap-1">
@@ -51,10 +51,11 @@ const MetricCard = ({
             </div>
           )}
         </div>
-        <div className={cn('p-3 rounded-full bg-gray-50', colors[color])}>
-          <ApperIcon name={icon} size={24} />
+        <div className={cn('p-4 rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-lg', colors[color])}>
+          <ApperIcon name={icon} size={28} />
         </div>
       </div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400 to-indigo-400 opacity-5 rounded-full transform translate-x-6 -translate-y-6"></div>
     </Card>
   )
 }

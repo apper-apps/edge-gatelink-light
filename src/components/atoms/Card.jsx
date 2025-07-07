@@ -7,10 +7,11 @@ const Card = forwardRef(({
   variant = 'default',
   ...props 
 }, ref) => {
-  const variants = {
+const variants = {
     default: 'bg-white shadow-card',
     surface: 'bg-surface shadow-subtle',
-    elevated: 'bg-white shadow-elevated'
+    elevated: 'bg-white shadow-elevated',
+    gradient: 'bg-gradient-to-br from-white to-purple-50 shadow-lg border-purple-100'
   }
 
   return (

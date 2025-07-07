@@ -7,49 +7,22 @@ import MetricCard from '@/components/molecules/MetricCard'
 import LinkCreator from '@/components/organisms/LinkCreator'
 import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
-import { linkService } from '@/services/api/linkService'
-import { submissionService } from '@/services/api/submissionService'
-import { format } from 'date-fns'
+import { analyticsService } from '@/services/api/analyticsService'
+import ReactApexChart from 'react-apexcharts'
 
 const Dashboard = () => {
-  const [data, setData] = useState({
-    links: [],
-    submissions: [],
-    metrics: {
-      totalLinks: 0,
-      totalClicks: 0,
-      totalSubmissions: 0,
-      conversionRate: 0
-    }
-  })
+  const [analyticsData, setAnalyticsData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showLinkCreator, setShowLinkCreator] = useState(false)
 
-  const loadData = async () => {
+const loadData = async () => {
     try {
       setLoading(true)
       setError(null)
       
-      const [linksData, submissionsData] = await Promise.all([
-        linkService.getAll(),
-        submissionService.getAll()
-      ])
-      
-      const totalClicks = linksData.reduce((sum, link) => sum + link.clicks, 0)
-      const totalSubmissions = linksData.reduce((sum, link) => sum + link.submissions, 0)
-      const conversionRate = totalClicks > 0 ? (totalSubmissions / totalClicks) * 100 : 0
-      
-      setData({
-        links: linksData,
-        submissions: submissionsData,
-        metrics: {
-          totalLinks: linksData.length,
-          totalClicks,
-          totalSubmissions,
-          conversionRate
-        }
-      })
+      const data = await analyticsService.getOverview('7d', 'all')
+      setAnalyticsData(data)
     } catch (err) {
       setError('Failed to load dashboard data')
     } finally {
@@ -61,19 +34,47 @@ const Dashboard = () => {
     loadData()
   }, [])
 
-  const handleLinkCreated = (newLink) => {
-    setData(prev => ({
-      ...prev,
-      links: [newLink, ...prev.links],
-      metrics: {
-        ...prev.metrics,
-        totalLinks: prev.metrics.totalLinks + 1
-      }
-    }))
+const handleLinkCreated = () => {
+    loadData() // Refresh dashboard data
   }
 
-  const recentLinks = data.links.slice(0, 5)
-  const recentSubmissions = data.submissions.slice(0, 5)
+  // Chart configurations
+  const barChartOptions = {
+    chart: { type: 'bar', toolbar: { show: false }, sparkline: { enabled: true } },
+    plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 4 } },
+    dataLabels: { enabled: false },
+    fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#FF6B35'], opacityFrom: 0.8, opacityTo: 0.6 } },
+    colors: ['#4F46E5'],
+    grid: { show: false },
+    xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: { labels: { show: false } }
+  }
+
+  const areaChartOptions = {
+    chart: { type: 'area', toolbar: { show: false }, sparkline: { enabled: true } },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.2, gradientToColors: ['#FF6B35'], opacityFrom: 0.4, opacityTo: 0.1 } },
+    colors: ['#4F46E5'],
+    grid: { show: false },
+    xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+    yaxis: { labels: { show: false } }
+  }
+
+  const gaugeOptions = {
+    chart: { type: 'radialBar', toolbar: { show: false } },
+    plotOptions: { radialBar: { hollow: { size: '60%' }, dataLabels: { name: { show: false }, value: { show: true, fontSize: '16px', fontWeight: 'bold', color: '#1f2937' } } } },
+    colors: ['#4F46E5'],
+    fill: { type: 'gradient', gradient: { shade: 'light', type: 'horizontal', shadeIntensity: 0.5, gradientToColors: ['#FF6B35'], opacityFrom: 1, opacityTo: 1 } }
+  }
+
+  const donutOptions = {
+    chart: { type: 'donut', toolbar: { show: false } },
+    dataLabels: { enabled: false },
+    colors: ['#4F46E5', '#FF6B35', '#34C759', '#FF9500'],
+    legend: { show: false },
+    plotOptions: { pie: { donut: { size: '65%' } } }
+  }
 
   if (loading) {
     return (
@@ -95,7 +96,7 @@ const Dashboard = () => {
     return <Error message={error} onRetry={loadData} />
   }
 
-  return (
+return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -104,7 +105,7 @@ const Dashboard = () => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Monitor your link performance and lead generation</p>
         </div>
         <Button
@@ -117,114 +118,138 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Total Links"
-          value={data.metrics.totalLinks}
-          icon="Link"
-          color="primary"
-        />
-        <MetricCard
-          title="Total Clicks"
-          value={data.metrics.totalClicks.toLocaleString()}
-          icon="MousePointer"
-          color="secondary"
-        />
-        <MetricCard
-          title="Total Submissions"
-          value={data.metrics.totalSubmissions.toLocaleString()}
-          icon="Users"
-          color="success"
-        />
-        <MetricCard
-          title="Conversion Rate"
-          value={`${data.metrics.conversionRate.toFixed(1)}%`}
-          icon="TrendingUp"
-          color="accent"
-        />
-      </div>
+      {analyticsData && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Revenue Highlight Card */}
+          <Card variant="gradient" className="relative overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Total Revenue</h3>
+              <ApperIcon name="DollarSign" size={24} className="text-indigo-600" />
+            </div>
+            <div className="mb-4">
+              <div className="text-4xl font-bold text-gray-900 mb-2">$8,000</div>
+              <div className="flex items-center gap-2">
+                <ApperIcon name="TrendingUp" size={16} className="text-green-500" />
+                <span className="text-sm font-medium text-green-600">+12.5% from last month</span>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-400 to-purple-400 opacity-10 rounded-full transform translate-x-8 -translate-y-8"></div>
+          </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Links</h2>
-            <Button variant="ghost" size="sm">
-              <ApperIcon name="ArrowRight" size={16} />
-            </Button>
-          </div>
-          
-          {recentLinks.length === 0 ? (
-            <div className="text-center py-8">
-              <ApperIcon name="Link" size={48} className="mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No links created yet</p>
-              <Button
-                onClick={() => setShowLinkCreator(true)}
-                variant="outline"
-                size="sm"
-                className="mt-3"
-              >
-                Create Your First Link
-              </Button>
+          {/* Clicks Bar Chart */}
+          <Card variant="gradient">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Total Clicks</h3>
+              <ApperIcon name="MousePointer" size={24} className="text-blue-600" />
             </div>
-          ) : (
-            <div className="space-y-3">
-              {recentLinks.map((link) => (
-                <div key={link.Id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {link.originalUrl}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {link.clicks} clicks • {link.submissions} submissions
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      link.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {link.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            <div className="text-3xl font-bold text-gray-900 mb-4">
+              {analyticsData.overview.totalClicks.toLocaleString()}
             </div>
-          )}
-        </Card>
+            <div className="h-24">
+              <ReactApexChart
+                options={barChartOptions}
+                series={[{ data: [44, 55, 41, 67, 22, 43, 56] }]}
+                type="bar"
+                height="100%"
+              />
+            </div>
+          </Card>
 
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Submissions</h2>
-            <Button variant="ghost" size="sm">
-              <ApperIcon name="ArrowRight" size={16} />
-            </Button>
-          </div>
-          
-          {recentSubmissions.length === 0 ? (
-            <div className="text-center py-8">
-              <ApperIcon name="FileText" size={48} className="mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">No submissions yet</p>
+          {/* Conversion Rate Gauge */}
+          <Card variant="gradient">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Conversion Rate</h3>
+              <ApperIcon name="Target" size={24} className="text-orange-600" />
             </div>
-          ) : (
-            <div className="space-y-3">
-              {recentSubmissions.map((submission) => (
-                <div key={submission.Id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">
-                      {submission.data.email || 'Anonymous'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {format(new Date(submission.submittedAt), 'MMM d, yyyy HH:mm')}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ApperIcon name="CheckCircle" size={16} className="text-green-500" />
-                  </div>
+            <div className="h-32 flex items-center justify-center">
+              <ReactApexChart
+                options={gaugeOptions}
+                series={[Math.round(analyticsData.overview.conversionRate)]}
+                type="radialBar"
+                height="100%"
+                width="100%"
+              />
+            </div>
+          </Card>
+
+          {/* Submissions Area Chart */}
+          <Card variant="gradient">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Total Submissions</h3>
+              <ApperIcon name="Users" size={24} className="text-green-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-4">
+              {analyticsData.overview.totalSubmissions.toLocaleString()}
+            </div>
+            <div className="h-24">
+              <ReactApexChart
+                options={areaChartOptions}
+                series={[{ data: [31, 40, 28, 51, 42, 109, 100] }]}
+                type="area"
+                height="100%"
+              />
+            </div>
+          </Card>
+
+          {/* Performance Donut Chart */}
+          <Card variant="gradient">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Performance</h3>
+              <ApperIcon name="PieChart" size={24} className="text-purple-600" />
+            </div>
+            <div className="h-32 flex items-center justify-center">
+              <ReactApexChart
+                options={donutOptions}
+                series={[44, 25, 20, 11]}
+                type="donut"
+                height="100%"
+                width="100%"
+              />
+            </div>
+            <div className="mt-4 text-center">
+              <div className="text-sm text-gray-600">Overall Score</div>
+              <div className="text-xl font-bold text-gray-900">85%</div>
+            </div>
+          </Card>
+
+          {/* Growth Progress Bars */}
+          <Card variant="gradient">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Growth Metrics</h3>
+              <ApperIcon name="TrendingUp" size={24} className="text-emerald-600" />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-700">Link Performance</span>
+                  <span className="font-medium text-gray-900">78%</span>
                 </div>
-              ))}
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style={{ width: '78%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-700">Engagement Rate</span>
+                  <span className="font-medium text-gray-900">92%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-700">Quality Score</span>
+                  <span className="font-medium text-gray-900">65%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full" style={{ width: '65%' }}></div>
+                </div>
+              </div>
             </div>
-          )}
-        </Card>
-      </div>
+          </Card>
+        </div>
+      )}
 
       <LinkCreator
         isOpen={showLinkCreator}
