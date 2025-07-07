@@ -1,0 +1,57 @@
+[
+  {
+    "Id": 1,
+    "originalUrl": "https://example.com/premium-guide.pdf",
+    "gatedUrl": "https://gatelink.pro/g/abc123def",
+    "formId": 1,
+    "status": "active",
+    "clicks": 245,
+    "submissions": 38,
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "originalUrl": "https://example.com/webinar-recording",
+    "gatedUrl": "https://gatelink.pro/g/xyz789ghi",
+    "formId": 2,
+    "status": "active",
+    "clicks": 189,
+    "submissions": 29,
+    "createdAt": "2024-01-14T14:20:00Z",
+    "updatedAt": "2024-01-14T14:20:00Z"
+  },
+  {
+    "Id": 3,
+    "originalUrl": "https://example.com/case-study-download",
+    "gatedUrl": "https://gatelink.pro/g/jkl456mno",
+    "formId": 3,
+    "status": "paused",
+    "clicks": 156,
+    "submissions": 22,
+    "createdAt": "2024-01-13T09:15:00Z",
+    "updatedAt": "2024-01-13T09:15:00Z"
+  },
+  {
+    "Id": 4,
+    "originalUrl": "https://example.com/exclusive-content",
+    "gatedUrl": "https://gatelink.pro/g/pqr123stu",
+    "formId": 1,
+    "status": "active",
+    "clicks": 312,
+    "submissions": 54,
+    "createdAt": "2024-01-12T16:45:00Z",
+    "updatedAt": "2024-01-12T16:45:00Z"
+  },
+  {
+    "Id": 5,
+    "originalUrl": "https://example.com/whitepaper-2024",
+    "gatedUrl": "https://gatelink.pro/g/vwx789yz",
+    "formId": 2,
+    "status": "active",
+    "clicks": 203,
+    "submissions": 31,
+    "createdAt": "2024-01-11T11:30:00Z",
+    "updatedAt": "2024-01-11T11:30:00Z"
+  }
+]

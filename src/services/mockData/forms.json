@@ -1,0 +1,151 @@
+[
+  {
+    "Id": 1,
+    "name": "Lead Capture Form",
+    "description": "Basic form for capturing leads with essential contact information",
+    "fields": [
+      {
+        "id": "name",
+        "type": "text",
+        "label": "Full Name",
+        "required": true,
+        "placeholder": "Enter your full name"
+      },
+      {
+        "id": "email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "Enter your email"
+      },
+      {
+        "id": "company",
+        "type": "text",
+        "label": "Company",
+        "required": false,
+        "placeholder": "Your company name"
+      },
+      {
+        "id": "phone",
+        "type": "tel",
+        "label": "Phone Number",
+        "required": false,
+        "placeholder": "Your phone number"
+      }
+    ],
+    "theme": {
+      "backgroundColor": "#FFFFFF",
+      "buttonColor": "#007AFF",
+      "textColor": "#1C1C1E"
+    },
+    "coverImage": "",
+    "headline": "Get Access to Premium Content",
+    "description": "Fill out this form to access our exclusive resource.",
+    "createdAt": "2024-01-10T10:00:00Z",
+    "updatedAt": "2024-01-10T10:00:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Event Registration",
+    "description": "Detailed form for event registrations with additional preferences",
+    "fields": [
+      {
+        "id": "name",
+        "type": "text",
+        "label": "Full Name",
+        "required": true,
+        "placeholder": "Enter your full name"
+      },
+      {
+        "id": "email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "Enter your email"
+      },
+      {
+        "id": "company",
+        "type": "text",
+        "label": "Company",
+        "required": true,
+        "placeholder": "Your company name"
+      },
+      {
+        "id": "role",
+        "type": "select",
+        "label": "Job Role",
+        "required": true,
+        "options": [
+          "Marketing Manager",
+          "Sales Representative",
+          "CEO/Founder",
+          "Other"
+        ]
+      },
+      {
+        "id": "interests",
+        "type": "checkbox",
+        "label": "Areas of Interest",
+        "required": false,
+        "options": [
+          "Lead Generation",
+          "Content Marketing",
+          "Analytics",
+          "Automation"
+        ]
+      }
+    ],
+    "theme": {
+      "backgroundColor": "#F2F2F7",
+      "buttonColor": "#5856D6",
+      "textColor": "#1C1C1E"
+    },
+    "coverImage": "",
+    "headline": "Register for Our Exclusive Event",
+    "description": "Join industry leaders for insights and networking.",
+    "createdAt": "2024-01-09T14:30:00Z",
+    "updatedAt": "2024-01-09T14:30:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "Newsletter Signup",
+    "description": "Simple form for newsletter subscriptions",
+    "fields": [
+      {
+        "id": "email",
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "Enter your email"
+      },
+      {
+        "id": "name",
+        "type": "text",
+        "label": "First Name",
+        "required": false,
+        "placeholder": "Enter your first name"
+      },
+      {
+        "id": "frequency",
+        "type": "select",
+        "label": "Email Frequency",
+        "required": false,
+        "options": [
+          "Daily",
+          "Weekly",
+          "Monthly"
+        ]
+      }
+    ],
+    "theme": {
+      "backgroundColor": "#FFFFFF",
+      "buttonColor": "#34C759",
+      "textColor": "#1C1C1E"
+    },
+    "coverImage": "",
+    "headline": "Stay Updated with Our Newsletter",
+    "description": "Get the latest updates and insights delivered to your inbox.",
+    "createdAt": "2024-01-08T09:15:00Z",
+    "updatedAt": "2024-01-08T09:15:00Z"
+  }
+]
