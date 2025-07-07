@@ -25,10 +25,48 @@ const LinkTable = ({ links, onLinkUpdate, onLinkDelete }) => {
       setLoading(prev => ({ ...prev, [linkId]: false }))
     }
   }
-
-  const handleCopyLink = (gatedUrl) => {
-    navigator.clipboard.writeText(gatedUrl)
-    toast.success('Link copied to clipboard')
+const handleCopyLink = async (gatedUrl) => {
+    try {
+      // Try modern Clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(gatedUrl)
+        toast.success('Link copied to clipboard')
+        return
+      }
+      
+      // Fallback to legacy method
+      const textArea = document.createElement('textarea')
+      textArea.value = gatedUrl
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      try {
+        const successful = document.execCommand('copy')
+        if (successful) {
+          toast.success('Link copied to clipboard')
+        } else {
+          throw new Error('Copy command failed')
+        }
+      } catch (execError) {
+        // Final fallback - show manual copy instruction
+        toast.error('Unable to copy automatically. Please copy manually: ' + gatedUrl)
+      } finally {
+        document.body.removeChild(textArea)
+      }
+    } catch (error) {
+      console.error('Clipboard copy failed:', error)
+      
+      // Handle specific permission errors
+      if (error.name === 'NotAllowedError' || error.message.includes('permissions policy')) {
+        toast.error('Clipboard access blocked. Please copy the link manually.')
+      } else {
+        toast.error('Failed to copy link. Please try again or copy manually.')
+      }
+    }
   }
 
   const handleDeleteLink = async (linkId) => {
